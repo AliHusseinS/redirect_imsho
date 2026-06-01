@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>- تطبيق امشو</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --primary-rgb: 99, 102, 241;
+            --secondary: #ec4899;
+            --bg-dark-1: #0b0f19;
+            --bg-dark-2: #05070c;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-ar: 'Tajawal', sans-serif;
+            --font-en: 'Outfit', sans-serif;
+            
+            --android-color: #3ddc84;
+            --ios-color: #ffffff;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark-2);
+            color: var(--text-main);
+            font-family: var(--font-ar);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow-1 {
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            top: -10%;
+            right: -10%;
+            animation: glow-float 20s infinite alternate;
+        }
+
+        .bg-glow-2 {
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            bottom: -10%;
+            left: -10%;
+            animation: glow-float 25s infinite alternate-reverse;
+        }
+
+        @keyframes glow-float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 40px 20px;
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .glass {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .view {
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
+
+        .view.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        .redirect-card {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .loader-container {
+            position: relative;
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pulse-ring {
+            width: 100px;
+            height: 100px;
+            border: 3px solid rgba(var(--primary-rgb), 0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1.5s infinite linear;
+            position: absolute;
+            top: 35px;
+        }
+
+        .pulse-icon {
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.2) 0%, rgba(var(--primary-rgb), 0.05) 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            color: var(--primary-light);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(var(--primary-rgb), 0); }
+        }
+
+        .redirect-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .redirect-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .fallback-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .app-info-header {
+            margin-bottom: 30px;
+        }
+
+        .fallback-app-icon {
+            font-size: 3rem;
+            color: var(--primary-light);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .app-tagline {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .store-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 35px;
+        }
+
+        .store-btn {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 14px 24px;
+            color: #fff;
+            text-decoration: none;
+            text-align: right;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .store-btn i {
+            font-size: 2rem;
+            margin-left: 15px;
+        }
+
+        .store-btn-ios i {
+            color: var(--ios-color);
+        }
+
+        .store-btn-android i {
+            color: var(--android-color);
+        }
+
+        .store-btn .btn-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .store-btn .btn-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-ar);
+        }
+
+        .store-btn .btn-text strong {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: var(--font-en);
+        }
+
+        .store-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .store-btn-ios:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .store-btn-android:hover {
+            border-color: rgba(61, 220, 132, 0.4);
+        }
+
+        .qr-fallback-section {
+            border-top: 1px solid var(--card-border);
+            padding-top: 25px;
+            width: 100%;
+        }
+
+        .qr-fallback-section p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .qr-frame {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .qr-frame canvas {
+            display: block;
+            width: 150px;
+            height: 150px;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(var(--primary-rgb), 0.4));
+        }
+
+        .logo h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #fff;
+            font-family: var(--font-ar);
+        }
+
+        .logo h1 span {
+            font-family: var(--font-en);
+            font-weight: 300;
+            font-size: 1.8rem;
+            color: var(--primary-light);
+        }
+
+        .main-header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .inputs-section {
+            padding: 30px;
+        }
+
+        .inputs-section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .icon-margin {
+            margin-left: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .color-android { color: var(--android-color); }
+        .color-ios { color: #aaa; }
+
+        .form-group input[type="text"],
+        .form-group input[type="url"] {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
+        }
+
+        .input-tip {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .customization-row {
+            display: flex;
+            gap: 20px;
+            border-top: 1px solid var(--card-border);
+            padding-top: 25px;
+        }
+
+        .color-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            gap: 12px;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        .color-picker-wrapper span {
+            font-family: var(--font-en);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .preview-card {
+            padding: 0;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .dot.red { background-color: #ef4444; }
+        .dot.yellow { background-color: #eab308; }
+        .dot.green { background-color: #22c55e; }
+
+        .preview-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-right: auto;
+        }
+
+        .preview-content {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 24px;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            position: relative;
+            margin-bottom: 25px;
+            transition: var(--transition);
+            transform-origin: center;
+        }
+
+        .qr-code-container:hover {
+            transform: scale(1.02);
+        }
+
+        .qr-code-container canvas {
+            display: block;
+            width: 200px;
+            height: 200px;
+        }
+
+        .qr-center-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 1.4rem;
+            color: var(--bg-dark-1);
+            border: 2px solid white;
+        }
+
+        .preview-content h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+
+        .link-output-box {
+            width: 100%;
+            margin-bottom: 30px;
+            text-align: right;
+        }
+
+        .link-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .link-input-wrapper {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .link-input-wrapper input {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            color: var(--primary-light);
+            font-family: var(--font-en);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .action-btn-sm {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-right: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 0 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn-sm:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(var(--primary-rgb), 0.45);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .generator-footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        
+        .developer-info {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            font-family: var(--font-en);
+        }
+        
+        .developer-info a {
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            background: rgba(16, 185, 129, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 14px 28px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 999;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast.hidden {
+            bottom: -60px;
+            opacity: 0;
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        #toast-message {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-section {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .app-container {
+                margin: 20px 10px;
+            }
+            
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .inputs-section, .preview-content {
+                padding: 20px;
+            }
+            
+            .customization-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="app-container">
+        <div id="redirect-view" class="view hidden">
+            <div class="redirect-card card glass">
+                <div id="loader-section" class="loader-container">
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <h2 class="redirect-title" id="redirect-status">جاري توجيهك إلى المتجر المناسب...</h2>
+                    <p class="redirect-subtitle" id="redirect-substatus"></p>
+                </div>
+
+                <div id="desktop-fallback" class="fallback-container hidden">
+                    <div class="app-info-header">
+                        <div class="fallback-app-icon">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <h1 id="fallback-app-name" class="app-title">امشو</h1>
+                        <p class="app-tagline">متوفر الآن للهواتف الذكية</p>
+                    </div>
+
+                    <div class="store-buttons">
+                        <a id="fallback-ios-btn" href="#" target="_blank" class="store-btn store-btn-ios">
+                            <i class="fa-brands fa-apple"></i>
+                            <div class="btn-text">
+                                <span>تنزيل من</span>
+                                <strong>App Store</strong>
+                            </div>
+                        </a>
+                        <a id="fallback-android-btn" href="#" target="_blank" class="store-btn store-btn-android">
+                            <i class="fa-brands fa-google-play"></i>
+                            <div class="btn-text">
+                                <span>تنزيل من</span>
+                                <strong>Google Play</strong>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="qr-fallback-section">
+                        <p>هل تتصفح من الكمبيوتر؟ امسح الكود بهاتفك لتحميل التطبيق مباشرة:</p>
+                        <div class="qr-frame">
+                            <canvas id="fallback-qr-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="generator-view" class="view">
+            <header class="main-header">
+                <div class="logo">
+                    <i class="fa-solid fa-qrcode logo-icon"></i>
+                    <h1> <span>Imsho QR</span></h1>
+                </div>
+            </header>
+
+            <div class="grid-layout">
+                <main class="inputs-section card glass">
+                    <h2><i class="fa-solid fa-sliders icon-margin"></i> إعدادات الرابط والباركود</h2>
+                    
+                    <div class="form-group">
+                        <label for="app-name-input"><i class="fa-solid fa-signature"></i> اسم التطبيق</label>
+                        <input type="text" id="app-name-input" placeholder="اسم التطبيق" value="امشو">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="android-url-input"><i class="fa-brands fa-android color-android"></i> رابط تطبيق الأندرويد (Google Play)</label>
+                        <input type="url" id="android-url-input" placeholder="https://play.google.com/store/apps/details?id=..." value="https://play.google.com/store/apps/details?id=com.imsho.client.jsource&hl=en" dir="ltr">
+                        <small class="input-tip">يبدأ بـ https://play.google.com/...</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ios-url-input"><i class="fa-brands fa-apple color-ios"></i> رابط تطبيق الآيفون (App Store)</label>
+                        <input type="url" id="ios-url-input" placeholder="https://apps.apple.com/app/id..." value="https://apps.apple.com/ae/app/imsho-client/id6752800266?l=ar" dir="ltr">
+                        <small class="input-tip">يبدأ بـ https://apps.apple.com/...</small>
+                    </div>
+
+                    <div class="customization-row">
+                        <div class="form-group color-group">
+                            <label for="qr-color-input"><i class="fa-solid fa-palette"></i> لون كود QR</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="qr-color-input" value="#6366f1">
+                                <span id="color-hex-label">#6366f1</span>
+                            </div>
+                        </div>
+                        <div class="form-group color-group">
+                            <label for="qr-bg-input"><i class="fa-solid fa-fill-drip"></i> لون الخلفية</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="qr-bg-input" value="#ffffff">
+                                <span id="bg-hex-label">#ffffff</span>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <aside class="preview-section">
+                    <div class="preview-card card glass">
+                        <div class="preview-header">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                            <span class="preview-title">معاينة النتيجة</span>
+                        </div>
+                        
+                        <div class="preview-content">
+                            <div class="qr-code-container">
+                                <canvas id="generator-qr-canvas"></canvas>
+                                <div class="qr-center-logo">
+                                    <i class="fa-solid fa-mobile-screen-button"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 id="preview-app-title">امشو</h3>
+                            
+                            <div class="link-output-box">
+                                <span class="link-label">الرابط الذكي الخاص بك:</span>
+                                <div class="link-input-wrapper">
+                                    <input type="text" id="smart-link-output" readonly value="" dir="ltr">
+                                    <button id="copy-btn" class="action-btn-sm" title="نسخ الرابط">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button id="download-btn" class="btn btn-primary">
+                                    <i class="fa-solid fa-download"></i> تحميل (PNG)
+                                </button>
+                                <button id="test-btn" class="btn btn-secondary">
+                                    <i class="fa-solid fa-circle-play"></i> test link ا
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            
+            <footer class="generator-footer">
+                <p>جميع الحقوق محفوظة ©  imsho app</p>
+                <div class="developer-info">
+                    Developed by: Eng Ali Razaq &mdash; Email: <a href="mailto:alir.allaithawi@uokufa.edu.iq">alir.allaithawi@uokufa.edu.iq</a>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <span id="toast-message">تم نسخ الرابط بنجاح!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const generatorView = document.getElementById('generator-view');
+            const redirectView = document.getElementById('redirect-view');
+            
+            const loaderSection = document.getElementById('loader-section');
+            const redirectStatus = document.getElementById('redirect-status');
+            const redirectSubstatus = document.getElementById('redirect-substatus');
+            const desktopFallback = document.getElementById('desktop-fallback');
+            const fallbackAppName = document.getElementById('fallback-app-name');
+            const fallbackIosBtn = document.getElementById('fallback-ios-btn');
+            const fallbackAndroidBtn = document.getElementById('fallback-android-btn');
+            const fallbackQrCanvas = document.getElementById('fallback-qr-canvas');
+
+            const appNameInput = document.getElementById('app-name-input');
+            const androidUrlInput = document.getElementById('android-url-input');
+            const iosUrlInput = document.getElementById('ios-url-input');
+            const qrColorInput = document.getElementById('qr-color-input');
+            const qrBgInput = document.getElementById('qr-bg-input');
+            const colorHexLabel = document.getElementById('color-hex-label');
+            const bgHexLabel = document.getElementById('bg-hex-label');
+            
+            const generatorQrCanvas = document.getElementById('generator-qr-canvas');
+            const previewAppTitle = document.getElementById('preview-app-title');
+            const smartLinkOutput = document.getElementById('smart-link-output');
+            
+            const copyBtn = document.getElementById('copy-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const testBtn = document.getElementById('test-btn');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+
+            let generatorQr = null;
+
+            function getQueryParams() {
+                const params = {};
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                
+                urlParams.forEach((value, key) => {
+                    params[key] = value;
+                });
+                return params;
+            }
+
+            function handleRedirection(params) {
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const appName = params.name || 'امشو';
+                const androidUrl = params.android || '';
+                const iosUrl = params.ios || '';
+                
+                const isAndroid = /android/i.test(userAgent);
+                const isIOS = (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) || 
+                              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+                if (params.simulate) {
+                    showDesktopFallback(appName, androidUrl, iosUrl);
+                    return;
+                }
+
+                if (isAndroid && androidUrl) {
+                    if (redirectStatus) redirectStatus.textContent = 'جاري توجيهك لمتجر Google Play...';
+                    if (redirectSubstatus) redirectSubstatus.textContent = `تحميل تطبيق: ${appName}`;
+                    setTimeout(() => {
+                        window.location.href = androidUrl;
+                    }, 1000);
+                } else if (isIOS && iosUrl) {
+                    if (redirectStatus) redirectStatus.textContent = 'جاري توجيهك لمتجر App Store...';
+                    if (redirectSubstatus) redirectSubstatus.textContent = `تحميل تطبيق: ${appName}`;
+                    setTimeout(() => {
+                        window.location.href = iosUrl;
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        showDesktopFallback(appName, androidUrl, iosUrl);
+                    }, 800);
+                }
+            }
+
+            function showDesktopFallback(appName, androidUrl, iosUrl) {
+                if (loaderSection) loaderSection.classList.add('hidden');
+                if (desktopFallback) desktopFallback.classList.remove('hidden');
+                if (fallbackAppName) fallbackAppName.textContent = appName;
+                
+                if (fallbackIosBtn) {
+                    if (iosUrl) {
+                        fallbackIosBtn.href = iosUrl;
+                        fallbackIosBtn.style.display = 'flex';
+                    } else {
+                        fallbackIosBtn.style.display = 'none';
+                    }
+                }
+
+                if (fallbackAndroidBtn) {
+                    if (androidUrl) {
+                        fallbackAndroidBtn.href = androidUrl;
+                        fallbackAndroidBtn.style.display = 'flex';
+                    } else {
+                        fallbackAndroidBtn.style.display = 'none';
+                    }
+                }
+
+                const currentUrl = window.location.href.split('&simulate=')[0];
+                
+                if (fallbackQrCanvas) {
+                    new QRious({
+                        element: fallbackQrCanvas,
+                        value: currentUrl,
+                        size: 300,
+                        background: '#ffffff',
+                        foreground: '#0b0f19',
+                        level: 'H'
+                    });
+                }
+            }
+
+            function copyFallback() {
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showToast('تم نسخ بنجاح!');
+                    } else {
+                        showToast('فشل نسخ الرابط، يرجى نسخه يدوياً.');
+                    }
+                } catch (err) {
+                    showToast('فشل نسخ الرابط، يرجى نسخه يدوياً.');
+                }
+            }
+
+            function showToast(message) {
+                if (toastMessage && toast) {
+                    toastMessage.textContent = message;
+                    toast.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 2500);
+                }
+            }
+
+            function drawCenterLogo(canvas, qrColor, qrBg) {
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+                const size = canvas.width;
+                const logoSize = size * 0.20;
+                
+                ctx.fillStyle = qrBg === '#ffffff' ? '#ffffff' : qrBg;
+                ctx.beginPath();
+                ctx.arc(size/2, size/2, logoSize/2 + 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = qrColor;
+                ctx.beginPath();
+                ctx.arc(size/2, size/2, logoSize/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#ffffff';
+                ctx.fillStyle = '#ffffff';
+                ctx.lineWidth = size * 0.008;
+                
+                const phoneW = logoSize * 0.38;
+                const phoneH = logoSize * 0.65;
+                const phoneX = size/2 - phoneW/2;
+                const phoneY = size/2 - phoneH/2;
+                const radius = size * 0.015;
+                
+                ctx.beginPath();
+                ctx.moveTo(phoneX + radius, phoneY);
+                ctx.lineTo(phoneX + phoneW - radius, phoneY);
+                ctx.quadraticCurveTo(phoneX + phoneW, phoneY, phoneX + phoneW, phoneY + radius);
+                ctx.lineTo(phoneX + phoneW, phoneY + phoneH - radius);
+                ctx.quadraticCurveTo(phoneX + phoneW, phoneY + phoneH, phoneX + phoneW - radius, phoneY + phoneH);
+                ctx.lineTo(phoneX + radius, phoneY + phoneH);
+                ctx.quadraticCurveTo(phoneX, phoneY + phoneH, phoneX, phoneY + phoneH - radius);
+                ctx.lineTo(phoneX, phoneY + radius);
+                ctx.quadraticCurveTo(phoneX, phoneY, phoneX + radius, phoneY);
+                ctx.closePath();
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(size/2, phoneY + phoneH - (phoneH * 0.15), size * 0.006, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(size/2 - (phoneW * 0.2), phoneY + (phoneH * 0.12));
+                ctx.lineTo(size/2 + (phoneW * 0.2), phoneY + (phoneH * 0.12));
+                ctx.stroke();
+            }
+
+            function updateGeneratorState() {
+                try {
+                    const appName = appNameInput ? (appNameInput.value.trim() || 'امشو') : 'امشو';
+                    const androidUrl = androidUrlInput ? androidUrlInput.value.trim() : '';
+                    const iosUrl = iosUrlInput ? iosUrlInput.value.trim() : '';
+                    const qrColor = qrColorInput ? qrColorInput.value : '#6366f1';
+                    const qrBg = qrBgInput ? qrBgInput.value : '#ffffff';
+
+                    if (previewAppTitle) previewAppTitle.textContent = appName;
+
+                    const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                    const params = new URLSearchParams();
+                    
+                    if (androidUrl) params.append('android', androidUrl);
+                    if (iosUrl) params.append('ios', iosUrl);
+                    if (appName && appName !== 'امشو') params.append('name', appName);
+
+                    const finalUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+                    if (smartLinkOutput) smartLinkOutput.value = finalUrl;
+
+                    if (generatorQr) {
+                        generatorQr.value = finalUrl;
+                        generatorQr.foreground = qrColor;
+                        generatorQr.background = qrBg;
+                    }
+
+                    if (generatorQrCanvas) {
+                        drawCenterLogo(generatorQrCanvas, qrColor, qrBg);
+                    }
+                } catch (error) {
+                    console.error('Error in updateGeneratorState:', error);
+                }
+            }
+
+            function initGenerator() {
+                try {
+                    const baseUrl = window.location.href.split('?')[0].split('#')[0];
+
+                    if (generatorQrCanvas) {
+                        generatorQr = new QRious({
+                            element: generatorQrCanvas,
+                            size: 400,
+                            level: 'H',
+                            value: baseUrl
+                        });
+                    }
+
+                    [appNameInput, androidUrlInput, iosUrlInput, qrColorInput, qrBgInput].forEach(input => {
+                        if (input) {
+                            input.addEventListener('input', updateGeneratorState);
+                        }
+                    });
+
+                    if (qrColorInput) {
+                        qrColorInput.addEventListener('input', (e) => {
+                            if (colorHexLabel) colorHexLabel.textContent = e.target.value.toUpperCase();
+                        });
+                    }
+                    if (qrBgInput) {
+                        qrBgInput.addEventListener('input', (e) => {
+                            if (bgHexLabel) bgHexLabel.textContent = e.target.value.toUpperCase();
+                        });
+                    }
+
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', () => {
+                            if (!smartLinkOutput) return;
+                            smartLinkOutput.select();
+                            smartLinkOutput.setSelectionRange(0, 99999);
+                            
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(smartLinkOutput.value)
+                                    .then(() => showToast('تم نسخ الرابط  بنجاح!'))
+                                    .catch(() => copyFallback());
+                            } else {
+                                copyFallback();
+                            }
+                        });
+                    }
+
+                    if (downloadBtn) {
+                        downloadBtn.addEventListener('click', () => {
+                            if (!generatorQrCanvas) return;
+                            const appName = appNameInput ? (appNameInput.value.trim() || 'app') : 'app';
+                            const filename = `${appName.replace(/\s+/g, '-').toLowerCase()}-smart-qr.png`;
+                            
+                            const link = document.createElement('a');
+                            link.download = filename;
+                            link.href = generatorQrCanvas.toDataURL('image/png');
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            showToast('بدأ تحميل !');
+                        });
+                    }
+
+                    if (testBtn) {
+                        testBtn.addEventListener('click', () => {
+                            if (!smartLinkOutput) return;
+                            const url = smartLinkOutput.value + '&simulate=true';
+                            window.open(url, '_blank');
+                        });
+                    }
+
+                    updateGeneratorState();
+                } catch (error) {
+                    console.error('Error in initGenerator:', error);
+                }
+            }
+
+            const queryParams = getQueryParams();
+            const isRedirectMode = !!(queryParams.android || queryParams.ios);
+
+            if (isRedirectMode) {
+                if (generatorView) generatorView.classList.add('hidden');
+                if (redirectView) redirectView.classList.remove('hidden');
+
+                handleRedirection(queryParams);
+            } else {
+                if (generatorView) generatorView.classList.remove('hidden');
+                if (redirectView) redirectView.classList.add('hidden');
+
+                initGenerator();
+            }
+        });
+    </script>
+</body>
+</html>
